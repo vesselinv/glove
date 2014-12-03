@@ -17,9 +17,9 @@ module Glove
     #
     # @param [String] text value for the text attribute
     # @param [Hash] options the options to initialize the instance with.
-    # @option options [Boolean] :stem Whether to stem the tokens
-    # @option options [Integer] :min_length the min allowed length of a word
-    # @option options [Integer] :max_length the max allowed length of a word
+    # @option options [Boolean] :stem (true) Whether to stem the tokens
+    # @option options [Integer] :min_length (3) the min allowed length of a word
+    # @option options [Integer] :max_length (25) the max allowed length of a word
     # @return [Glove::Parser] A new parser.
     def initialize(text, options={})
       @text, @opt = text, DEFAULTS.dup.merge(options)
