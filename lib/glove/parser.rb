@@ -2,6 +2,7 @@ module Glove
   # Takes a string of text and tokenizes it for usage in {Glove::Corpus}
   #
   class Parser
+    # Default options
     DEFAULTS = {
       stem:       true,
       min_length: 3,
