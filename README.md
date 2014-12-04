@@ -10,6 +10,7 @@ GloVe is an unsupervised learning algorithm for obtaining vector representations
 
 ## Resources
 
+- [Documentation](http://www.rubydoc.info/github/vesselinv/glove)
 - [Academic Paper on Global Vectors](http://nlp.stanford.edu/projects/glove/glove.pdf)
 - [Original C Implementation](http://nlp.stanford.edu/projects/glove/)
 - [glove-python](https://github.com/maciejkula/glove-python)
