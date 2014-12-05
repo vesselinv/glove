@@ -84,5 +84,13 @@ module Glove
     alias_method :build_index, :index
     alias_method :build_count, :count
     alias_method :build_pairs, :pairs
+
+    def marshal_dump
+      [@tokens, @count, @index, @pairs]
+    end
+
+    def marshal_load(contents)
+      @tokens, @count, @index, @pairs = contents
+    end
   end
 end

@@ -14,10 +14,11 @@ GloVe is an unsupervised learning algorithm for obtaining vector representations
 - [Academic Paper on Global Vectors](http://nlp.stanford.edu/projects/glove/glove.pdf)
 - [Original C Implementation](http://nlp.stanford.edu/projects/glove/)
 - [glove-python](https://github.com/maciejkula/glove-python)
+- [spark-glove](https://github.com/petro-rudenko/spark-glove)
 
 ## Dependencies
 
-This library replies on the [rb-gsl](http://blackwinter.github.io/rb-gsl) gem for Matrix and Vector operations, therefore you need GNU Scientific Library installed.
+This library relies on the [rb-gsl](http://blackwinter.github.io/rb-gsl) gem for Matrix and Vector operations, therefore you need GNU Scientific Library installed.
 
 Linux:
 
@@ -59,12 +60,23 @@ model.most_similar('physics', 1) # => {"quantum"=>0.9967993356234444}
 # What words relate to atom like quantum relates to physics?
 
 model.analogy_words('quantum', 'physics', 'atom') # => {"electron"=>0.9858380292886947, "energi"=>0.9815122410243475, "photon"=>0.9665073849076669}
+
+# Save the trained matrices and vectors for later usage in bianry formats
+
+model.save('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
+
+# Later on create a new onstance and call #load
+
+model = Glove::Model.new
+model.load('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
 ```
 
 ## TODO
 
 - Improve test coverage
 - Perform test and benchmark with texts containing more than 25K words.
+- Saving/loading of matrix and vector files
+- Word Vector graphs
 - Add stop words filtering in Glove::Parser
 
 ## Contributing

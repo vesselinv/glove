@@ -99,19 +99,43 @@ module Glove
       self
     end
 
-    # @todo save vectors and matrices to files. Save token index and pairs as
-    # well and then accept them as argument in #load??
-    def save(cooc_file, vec_file, bias_file)
+    # Save trained data to files
+    #
+    # @param [String] corpus_file Filename for corpus
+    # @param [String] cooc_file Filename for co-occurence matrix
+    # @param [String] vec_file Filename for Word Vector Maxtrix
+    # @param [String] bias_file Filename for Word Biases Vector
+    def save(corpus_file, cooc_file, vec_file, bias_file)
+      File.open(corpus_file, 'wb') do |file|
+        file.write Marshal.dump(corpus)
+      end
+
       cooc_matrix.fwrite(cooc_file)
       word_vec.fwrite(vec_file)
       word_biases.fwrite(bias_file)
     end
 
-    # @todo load vectors and matrices from files. Best to provide the text file
-    # path as well so that the token index and pairs can be reconstructed and
-    # hence the matrix sizes determined.
-    def load
-      raise "Not implemented"
+    # Loads training data from already existing files
+    #
+    # @param [String] corpus_file Filename for corpus
+    # @param [String] cooc_file Filename for co-occurence matrix
+    # @param [String] vec_file Filename for Word Vector Maxtrix
+    # @param [String] bias_file Filename for Word Biases Vector
+    def load(corpus_file, cooc_file, vec_file, bias_file)
+      @corpus = Marshal.load(File.binread(corpus_file))
+
+      @token_index = corpus.index
+      @token_pairs = corpus.pairs
+
+      size = token_index.size
+
+      @cooc_matrix = GSL::Matrix.alloc(size, size)
+      @word_vec    = GSL::Matrix.alloc(size, num_components)
+      @word_biases = GSL::Vector.alloc(size)
+
+      @cooc_matrix.fread(cooc_file)
+      @word_vec.fread(vec_file)
+      @word_biases.fread(bias_file)
     end
 
     # @todo create graph of the word vector matrix
