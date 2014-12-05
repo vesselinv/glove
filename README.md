@@ -2,6 +2,7 @@
 
 [![Code Climate](https://codeclimate.com/github/vesselinv/glove/badges/gpa.svg)](https://codeclimate.com/github/vesselinv/glove)
 [![Test Coverage](https://codeclimate.com/github/vesselinv/glove/badges/coverage.svg)](https://codeclimate.com/github/vesselinv/glove)
+[![Build Status](https://travis-ci.org/vesselinv/glove.svg)](https://travis-ci.org/vesselinv/glove)
 
 Ruby implementation of Global Vectors for Word Representations.
 

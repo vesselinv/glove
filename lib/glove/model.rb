@@ -279,7 +279,7 @@ module Glove
       word_index = token_index[word]
 
       return nil unless word_index
-      word_vec[word_index, nil]
+      word_vec.row(word_index)
     end
 
     def vector_distance(word)
@@ -287,7 +287,7 @@ module Glove
 
       token_index.map.with_index do |(token,count), idx|
         next if token.eql? word
-        [token, cosine(vector, word_vec[idx, nil])]
+        [token, cosine(vector, word_vec.row(idx))]
       end.compact.sort{ |a,b| b[1] <=> a[1] }
     end
 
