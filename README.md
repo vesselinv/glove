@@ -1,4 +1,7 @@
-# Glove
+# Ruby GloVe
+
+[![Code Climate](https://codeclimate.com/github/vesselinv/glove/badges/gpa.svg)](https://codeclimate.com/github/vesselinv/glove)
+[![Test Coverage](https://codeclimate.com/github/vesselinv/glove/badges/coverage.svg)](https://codeclimate.com/github/vesselinv/glove)
 
 Ruby implementation of Global Vectors for Word Representations.
 
