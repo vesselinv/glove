@@ -15,3 +15,5 @@ mkmf.log
 .ruby-version
 .ruby-gemset
 .DS_Store
+/benchmark/results/*
+!/benchmark/results/.keep

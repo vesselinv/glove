@@ -20,7 +20,9 @@ module Glove
     #   @return [GSL::Matrix] the word vector matrix
     # @!attribute [rw] word_biases
     #   @return [GSL::Vector] the vector holding the word biases
-    attr_reader :opts, :window, :epochs, :num_components, :min_count, :learning_rate, :alpha, :max_count, :threads, :cooc_matrix, :corpus, :token_index, :token_pairs
+    attr_reader :opts, :window, :epochs, :num_components, :min_count
+    attr_reader :learning_rate, :alpha, :max_count, :threads
+    attr_reader :cooc_matrix, :corpus, :token_index, :token_pairs
     attr_accessor :word_vec, :word_biases
 
     # Create a new {Glove::Model} instance. Accepts options for

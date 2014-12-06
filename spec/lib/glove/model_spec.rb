@@ -35,12 +35,64 @@ describe Glove::Model do
     pending
   end
 
-  describe '#save' do
-    pending
-  end
+  context "IO" do
+    let(:corpus) { Glove::Corpus.build('quick brown fox', min_count: 1) }
+    let(:cooc)   { GSL::Matrix.zeros(3,3) }
+    let(:words)  { GSL::Matrix.zeros(3, Glove::Model::DEFAULTS[:num_components]) }
+    let(:biases) { GSL::Vector.alloc([1,2,3]) }
 
-  describe '#load' do
-    pending
+    describe '#save' do
+      let(:files)  do
+        %w(corpus.bin cooc.bin words.bin biases.bin).map do |f|
+          File.join(fixtures_path, f)
+        end
+      end
+
+      before(:each) do
+        model.instance_variable_set(:@cooc_matrix, cooc)
+        model.instance_variable_set(:@corpus, corpus)
+        model.instance_variable_set(:@word_vec, words)
+        model.instance_variable_set(:@word_biases, biases)
+      end
+
+      it "dumps corpus, cooc_matrix, word_vec and word_biases to files" do
+        model.save(*files)
+
+        files.each do |file|
+          expect(File.size(file)).to be > 0
+        end
+
+        files.each{ |f| File.delete(f) }
+      end
+    end
+
+    describe '#load' do
+      let(:files)  do
+        %w(corpus-t.bin cooc-t.bin words-t.bin biases-t.bin).map do |f|
+          File.join(fixtures_path, f)
+        end
+      end
+
+      before(:each) do
+        model.load(*files)
+      end
+
+      it 'loads corpus data from file as first argument' do
+        expect(model.corpus.tokens).to eq(corpus.tokens)
+      end
+
+      it 'loads cooc_matrix data from file as second argument' do
+        expect(model.cooc_matrix).to eq(cooc)
+      end
+
+      it 'loads word_vec data from file as third argument' do
+        expect(model.word_vec).to eq(words)
+      end
+
+      it 'loads word_biases data from file as fourth argument' do
+        expect(model.word_biases).to eq(biases)
+      end
+    end
   end
 
   describe '#vizualize' do

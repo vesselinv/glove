@@ -58,28 +58,31 @@ model.train
 
 # So far, word similarity and analogy task methods have been included:
 
-# Most similar words to physics
-model.most_similar('physics', 1) # => {"quantum"=>0.9967993356234444}
+# Most similar words to quantum
+model.most_similar('quantum')
+# => {"physic"=>0.9974459436353388, "mechan"=>0.9971606266531394, "theori"=>0.9965966776283189}
 
 # What words relate to atom like quantum relates to physics?
 
-model.analogy_words('quantum', 'physics', 'atom') # => {"electron"=>0.9858380292886947, "energi"=>0.9815122410243475, "photon"=>0.9665073849076669}
+model.analogy_words('quantum', 'physics', 'atom')
+# => {"electron"=>0.9858380292886947, "energi"=>0.9815122410243475, "photon"=>0.9665073849076669}
 
-# Save the trained matrices and vectors for later usage in bianry formats
+# Save the trained matrices and vectors for later usage in binary formats
 
 model.save('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
 
-# Later on create a new onstance and call #load
+# Later on create a new instance and call #load
 
 model = Glove::Model.new
 model.load('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
+
+# Now you can query the model again and get the same results as above
 ```
 
 ## TODO
 
 - Improve test coverage
-- Perform test and benchmark with texts containing more than 25K words.
-- Saving/loading of matrix and vector files
+- Perform benchmark with texts containing more than 45K words.
 - Word Vector graphs
 - Add stop words filtering in Glove::Parser
 
