@@ -1,13 +1,13 @@
 module Glove
   class Model
-    # Default options
+    # Default options (see #initialize)
     DEFAULTS = {
       max_count:      100,
       learning_rate:  0.05,
       alpha:          0.75,
       num_components: 30,
       epochs:         5,
-      threads:        2
+      threads:        4
     }
 
     # @!attribute [r] corpus
@@ -33,12 +33,11 @@ module Glove
     # @option options [Integer] :max_count (100) Parameter specifying cutoff in
     #   weighting function
     # @option options [Float] :learning_rate (0.05) Initial learning rate
-    # @option options [Float] :alpha (0.75) Parameter in exponent of weighting
-    #   function
+    # @option options [Float] :alpha (0.75) Exponent of weighting function
     # @option options [Integer] :num_components (30) Column size of the word vector
     #   matrix
     # @option options [Integer] :epochs (5) Number of training iterations
-    # @option options [Integer] :threads (2) Number of threads to use in building
+    # @option options [Integer] :threads (4) Number of threads to use in building
     #   the co-occurence matrix and training iterations
     # @return [Glove::Model] A GloVe model.
     def initialize(options={})
@@ -64,16 +63,7 @@ module Glove
     #   model.fit(corpus)
     # @return [Glove::Model] Current instance
     def fit(text)
-      @corpus =
-        if text.is_a? Corpus
-          text
-        else
-          Corpus.build(text, opts)
-        end
-
-      @token_index = corpus.index
-      @token_pairs = corpus.pairs
-
+      fit_corpus(text)
       build_cooc_matrix
       self
     end
@@ -85,17 +75,10 @@ module Glove
       @word_vec       = GSL::Matrix.rand(cols, num_components)
       @word_biases    = GSL::Vector.alloc(cols)
       shuffle_indices = matrix_nnz
-      slice_size      = shuffle_indices.size / threads
 
       (0..epochs).each do |epoch|
         shuffled = shuffle_indices.shuffle
-        mutex = Mutex.new
-
-        # Split up the indices and assign them to a thread to avoid race conditions
-        workers = shuffled.each_slice(slice_size).map do |slice|
-          Thread.new{ epoch_thread(slice, mutex) }
-        end
-        workers.each(&:join)
+        @word_vec, @word_biases = Workers::TrainingWorker.new(self, shuffled).run
       end
 
       self
@@ -141,7 +124,7 @@ module Glove
     end
 
     # @todo create graph of the word vector matrix
-    def vizualize
+    def visualize
       raise "Not implemented"
     end
 
@@ -153,14 +136,15 @@ module Glove
     # @param [Float] accuracy Allowance in difference of target cosine
     #   and related word cosine distances
     # @example What words relate to atom like quantum relates to physics?
-    #   model.analogy_words('quantum', 'physics', 'atom') # => {"electron"=>0.9858380292886947, "energi"=>0.9815122410243475, "photon"=>0.9665073849076669}
+    #   model.analogy_words('quantum', 'physics', 'atom')
+    #   # => {"electron"=>0.98583, "energi"=>0.98151, "photon"=>0.96650}
     # @return [Hash{String=>Float}] List of related words to target
     def analogy_words(word1, word2, target, num = 3, accuracy = 0.0001)
       word1  = word1.stem
       word2  = word1.stem
       target = target.stem
 
-      distance = cosine(transform(word1), transform(word2))
+      distance = cosine(vector(word1), vector(word2))
 
       vector_distance(target).reject do |item|
         dist = item[1]
@@ -190,73 +174,22 @@ module Glove
 
     private
 
-    # Perform a train iteration
-    def epoch_thread(shuffled, mutex)
-      shuffled.each do |j|
-        w1, w2 = j
-        count = cooc_matrix[w1, w2]
-
-        prediction  = 0.0
-        word_a_norm = 0.0
-        word_b_norm = 0.0
-
-        word_vec.each_col do |col|
-          w1_context = col[w1]
-          w2_context = col[w2]
-
-          prediction = prediction + w1_context + w2_context
-          word_a_norm += w1_context * w1_context
-          word_b_norm += w2_context * w2_context
+    # Builds the corpus and sets @token_index and @token_pairs
+    def fit_corpus(text)
+      @corpus =
+        if text.is_a? Corpus
+          text
+        else
+          Corpus.build(text, opts)
         end
 
-        prediction = prediction + word_biases[w1] + word_biases[w2]
-        word_a_norm = Math.sqrt(word_a_norm)
-        word_b_norm = Math.sqrt(word_a_norm)
-        entry_weight = [1.0, (count/max_count)].min ** alpha
-        loss = entry_weight * (prediction - Math.log(count))
-
-        mutex.synchronize do
-          word_vec.each_col do |col|
-            col[w1] = (col[w1] - learning_rate * loss * col[w2]) / word_a_norm
-            col[w2] = (col[w2] - learning_rate * loss * col[w2]) / word_b_norm
-          end
-
-          word_biases[w1] -= learning_rate * loss
-          word_biases[w2] -= learning_rate * loss
-        end
-      end
+      @token_index = corpus.index
+      @token_pairs = corpus.pairs
     end
 
-    # Build the co-occurence matrix
+    # Buids the co-occurence matrix
     def build_cooc_matrix
-      size = token_index.size
-      slice_size = size / threads
-
-      @cooc_matrix = GSL::Matrix.alloc(size, size)
-      mutex = Mutex.new
-
-      workers = token_index.each_slice(slice_size).map do |slice|
-        Thread.new{ matrix_thread(slice, mutex) }
-      end
-      workers.each(&:join)
-    end
-
-    # Sum up the word-word co-ocurence count for a segment of the tokens,
-    # creates a word vector and set the corresponding cooc_maxtrix column values
-    def matrix_thread(token_slice, mutex)
-      token_slice.to_h.each do |token, index|
-        vector = GSL::Vector.alloc(token_index.size)
-
-        token_pairs.each do |pair|
-          key = token_index[pair.token]
-          sum = pair.neighbors.select{ |word| word == token }.size
-          vector[key] += sum
-        end
-
-        mutex.synchronize do
-          cooc_matrix.set_col(index, vector)
-        end
-      end
+      @cooc_matrix = Workers::CooccurrenceWorker.new(self).run
     end
 
     # Array of all non-zero (both row and col) value coordinates in the
@@ -273,11 +206,11 @@ module Glove
       entries
     end
 
-    # Find the vector values for a given word
+    # Find the vector row of @word_vec for a given word
     #
     # @param [String] word The word to transform into a vector
     # @return [GSL::Vector] The corresponding vector into the #word_vec matrix
-    def transform(word)
+    def vector(word)
       word_index = token_index[word]
 
       return nil unless word_index
@@ -285,11 +218,13 @@ module Glove
     end
 
     def vector_distance(word)
-      vector = transform(word)
+      word_vector = vector(word)
+
+      return {} unless word_vec
 
       token_index.map.with_index do |(token,count), idx|
         next if token.eql? word
-        [token, cosine(vector, word_vec.row(idx))]
+        [token, cosine(word_vector, word_vec.row(idx))]
       end.compact.sort{ |a,b| b[1] <=> a[1] }
     end
 

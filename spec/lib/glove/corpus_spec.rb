@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Glove::Corpus do
   let(:text) { "the quick brown fox jumped over the lazy dog" }
-  let(:opt)  { {window: 3, min_count: 2} }
+  let(:opt)  { {window: 3, min_count: 2, stop_words: false} }
   let(:corpus) { described_class.new(text, opt) }
 
   describe '.build(text, options)' do

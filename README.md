@@ -1,8 +1,9 @@
 # Ruby GloVe
 
+[![Build Status](https://travis-ci.org/vesselinv/glove.svg)](https://travis-ci.org/vesselinv/glove)
 [![Code Climate](https://codeclimate.com/github/vesselinv/glove/badges/gpa.svg)](https://codeclimate.com/github/vesselinv/glove)
 [![Test Coverage](https://codeclimate.com/github/vesselinv/glove/badges/coverage.svg)](https://codeclimate.com/github/vesselinv/glove)
-[![Build Status](https://travis-ci.org/vesselinv/glove.svg)](https://travis-ci.org/vesselinv/glove)
+[![Inline docs](http://inch-ci.org/github/vesselinv/glove.svg?branch=master)](http://inch-ci.org/github/vesselinv/glove)
 
 Ruby implementation of Global Vectors for Word Representations.
 
@@ -44,7 +45,6 @@ require 'glove'
 model = Glove::Model.new
 
 # Next feed it some text.
-
 text = File.read('quantum-physics.txt')
 model.fit(text)
 
@@ -53,29 +53,23 @@ corpus = Glove::Corpus.build(text)
 model.fit(corpus)
 
 # Finally, to query the model, we need to train it
-
 model.train
 
 # So far, word similarity and analogy task methods have been included:
-
 # Most similar words to quantum
 model.most_similar('quantum')
 # => {"physic"=>0.9974459436353388, "mechan"=>0.9971606266531394, "theori"=>0.9965966776283189}
 
 # What words relate to atom like quantum relates to physics?
-
 model.analogy_words('quantum', 'physics', 'atom')
 # => {"electron"=>0.9858380292886947, "energi"=>0.9815122410243475, "photon"=>0.9665073849076669}
 
 # Save the trained matrices and vectors for later usage in binary formats
-
 model.save('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
 
 # Later on create a new instance and call #load
-
 model = Glove::Model.new
 model.load('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
-
 # Now you can query the model again and get the same results as above
 ```
 

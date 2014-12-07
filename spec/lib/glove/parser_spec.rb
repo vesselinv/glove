@@ -5,7 +5,7 @@ describe Glove::Parser do
   let(:parser) { described_class.new(text) }
 
   describe '#tokenize' do
-    let(:tokens) { %w(the quick brown jump over the lazi) }
+    let(:tokens) { %w(quick brown jump lazi) }
 
     it "tokenizes the text string" do
       expect(parser.tokenize).to eq(tokens)
@@ -44,6 +44,12 @@ describe Glove::Parser do
       parser.split
 
       expect(parser.normalize).not_to include('Fx')
+    end
+  end
+
+  describe '#stop_words' do
+    it "filters all stop words from the text" do
+      expect(parser.stop_words).not_to include('the')
     end
   end
 end

@@ -36,7 +36,7 @@ describe Glove::Model do
   end
 
   context "IO" do
-    let(:corpus) { Glove::Corpus.build('quick brown fox', min_count: 1) }
+    let(:corpus) { Glove::Corpus.build('quick brown fox', min_count: 1, stop_words: false) }
     let(:cooc)   { GSL::Matrix.zeros(3,3) }
     let(:words)  { GSL::Matrix.zeros(3, Glove::Model::DEFAULTS[:num_components]) }
     let(:biases) { GSL::Vector.alloc([1,2,3]) }
@@ -95,7 +95,7 @@ describe Glove::Model do
     end
   end
 
-  describe '#vizualize' do
+  describe '#visualize' do
     pending
   end
 
