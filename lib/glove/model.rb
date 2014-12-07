@@ -217,6 +217,11 @@ module Glove
       word_vec.row(word_index)
     end
 
+    # Balculates the cosine distance of all the words in the vocabulary
+    # against a given word. Results are then sorted in DESC order
+    #
+    # @param [String] word The word to compare against
+    # @return [Array<(String, Integer)>] Array of tokens and their distance
     def vector_distance(word)
       word_vector = vector(word)
 

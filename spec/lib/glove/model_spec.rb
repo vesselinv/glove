@@ -100,10 +100,36 @@ describe Glove::Model do
   end
 
   describe '#analogy_words(word1, word2, target, num, accuracy)' do
-    pending
+    let(:distances)   { [["electron", 0.98583], ["radiation", 0.99998]] }
+    let(:target)      { 'atom' }
+    let(:pair_cosine) { 0.99999 }
+
+    before do
+      allow(model).to receive(:vector).and_return(0)
+      allow(model).to receive(:cosine).and_return(pair_cosine)
+      allow(model).to receive(:vector_distance).and_return(distances)
+    end
+
+    it 'returns the distances whose diff between the pair distance is less than accuracy arg' do
+      words = model.analogy_words('quantum', 'physics', target)
+
+      expect(words.keys).to     include('electron')
+      expect(words.keys).not_to include('radiation')
+    end
   end
 
   describe '#most_similar(word, num)' do
-    pending
+    let(:distances) { [["electron", 0.98583], ["radiation", 0.99998]] }
+
+    before do
+      allow(model).to receive(:vector_distance).and_return(distances)
+    end
+
+    it 'returns closest vectors to given word' do
+      words = model.most_similar('atom', 1)
+
+      expect(words.keys).to     include('electron')
+      expect(words.keys).not_to include('radiation')
+    end
   end
 end
