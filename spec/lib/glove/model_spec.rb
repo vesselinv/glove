@@ -111,10 +111,10 @@ describe Glove::Model do
     end
 
     it 'returns the distances whose diff between the pair distance is less than accuracy arg' do
-      words = model.analogy_words('quantum', 'physics', target)
+      words = model.analogy_words('quantum', 'physics', target).flatten
 
-      expect(words.keys).to     include('electron')
-      expect(words.keys).not_to include('radiation')
+      expect(words).to     include('electron')
+      expect(words).not_to include('radiation')
     end
   end
 
@@ -126,10 +126,10 @@ describe Glove::Model do
     end
 
     it 'returns closest vectors to given word' do
-      words = model.most_similar('atom', 1)
+      words = model.most_similar('atom', 1).flatten
 
-      expect(words.keys).to     include('electron')
-      expect(words.keys).not_to include('radiation')
+      expect(words).to     include('electron')
+      expect(words).not_to include('radiation')
     end
   end
 end
