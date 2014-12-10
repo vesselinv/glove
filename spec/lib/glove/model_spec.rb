@@ -32,7 +32,32 @@ describe Glove::Model do
   end
 
   describe '#train' do
-    pending
+    let(:token_index) { {'the' => 0, 'quick' => 1, 'brown' => 2, 'fox' => 3} }
+    let(:cooc_matrix) { GSL::Matrix.rand(4,4) }
+    let(:trainer)     { double(:train) }
+    before do
+      allow(model).to receive(:cooc_matrix).and_return(cooc_matrix)
+      allow(model).to receive(:token_index).and_return(token_index)
+      allow(model).to receive(:train_in_epochs).and_return(trainer)
+
+      model.train
+    end
+
+    after(:each) do
+      model.train
+    end
+
+    it 'creates @word_vec matrix with random floats' do
+      expect(model.word_vec.isnull?).to eq(false)
+    end
+
+    it 'creates @word_biases vector with zeros' do
+      expect(model.word_biases.isnull?).to eq(true)
+    end
+
+    it 'calls the #train_in_epochs method' do
+      expect(model).to receive(:train_in_epochs)
+    end
   end
 
   context "IO" do
@@ -130,6 +155,32 @@ describe Glove::Model do
 
       expect(words).to     include('electron')
       expect(words).not_to include('radiation')
+    end
+  end
+
+  describe '#train_in_epochs(indices)' do
+    let(:worker) { double(:train, run: nil) }
+    let(:epochs) { Glove::Model::DEFAULTS[:epochs] }
+    before do
+      allow(Glove::Workers::TrainingWorker).to receive(:new).and_return(worker)
+    end
+    it 'calls a traing worker exactly @epochs times' do
+      expect(worker).to receive(:run).exactly(epochs).times
+
+      model.send :train_in_epochs, []
+    end
+  end
+
+  describe '#matrix_nnz' do
+    let(:matrix) { GSL::Matrix[[0,9], [3,0]] }
+
+    before do
+      allow(model).to receive(:cooc_matrix).and_return(matrix)
+    end
+
+    it 'gets all non-zero value indices in the cooc_matrix' do
+      nnz = model.send :matrix_nnz
+      expect(nnz).to eq([[1,0], [0,1]])
     end
   end
 end

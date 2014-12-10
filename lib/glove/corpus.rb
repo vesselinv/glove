@@ -61,23 +61,29 @@ module Glove
 
     # Iterates over the tokens array and contructs {Glove::TokenPair}s where
     # neighbors holds the adjacent (context) words. The number of neighbours is
-    # controller by the :window option (on each side)
+    # controlled by the :window option (on each side)
     #
     # @return [Array<(Glove::TokenPair)>] Array of {Glove::TokenPair}s
     def pairs
       @pairs ||= tokens.map.with_index do |word, index|
         next unless count[word] >= min_count
 
-        pair      = TokenPair.new(word, [])
-        start_pos = index - window < 0 ? 0 : index - window
-        end_pos   = (index + window >= tokens.size) ? tokens.size - 1 : index + window
+        TokenPair.new(word, token_neighbors(word, index))
+      end.compact
+    end
 
-        tokens[start_pos..end_pos].each do |word2|
-          next if word == word2
-          pair.neighbors << word2
-        end
+    # Construct array of neighbours to the given word and its index in the tokens
+    # array
+    #
+    # @param [String] word The word to get neighbours for
+    # @param [Integer] index Index of the word in the @tokens array
+    # @return [Array<(String)>] List of the nighbours
+    def token_neighbors(word, index)
+      start_pos = index - window < 0 ? 0 : index - window
+      end_pos   = (index + window >= tokens.size) ? tokens.size - 1 : index + window
 
-        pair
+      tokens[start_pos..end_pos].map do |neighbor|
+        neighbor unless word == neighbor
       end.compact
     end
 
@@ -85,10 +91,12 @@ module Glove
     alias_method :build_count, :count
     alias_method :build_pairs, :pairs
 
+    # Data to dump with Marshal.dump
     def marshal_dump
       [@tokens, @count, @index, @pairs]
     end
 
+    # Reconstruct the instance data via Marshal.load
     def marshal_load(contents)
       @tokens, @count, @index, @pairs = contents
     end

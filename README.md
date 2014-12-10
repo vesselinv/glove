@@ -58,11 +58,11 @@ model.train
 # So far, word similarity and analogy task methods have been included:
 # Most similar words to quantum
 model.most_similar('quantum')
-# => {"physic"=>0.9974459436353388, "mechan"=>0.9971606266531394, "theori"=>0.9965966776283189}
+# => [["physic", 0.9974459436353388], ["mechan", 0.9971606266531394], ["theori", 0.9965966776283189]]
 
 # What words relate to atom like quantum relates to physics?
 model.analogy_words('quantum', 'physics', 'atom')
-# => {"electron"=>0.9858380292886947, "energi"=>0.9815122410243475, "photon"=>0.9665073849076669}
+# => [["electron", 0.9858380292886947], ["energi", 0.9815122410243475], ["photon", 0.9665073849076669]]
 
 # Save the trained matrices and vectors for later usage in binary formats
 model.save('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
@@ -76,9 +76,8 @@ model.load('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
 ## TODO
 
 - Improve test coverage
-- Perform benchmark with texts containing more than 45K words.
+- Perform benchmark with texts containing more than 100K words.
 - Word Vector graphs
-- Add stop words filtering in Glove::Parser
 
 ## Contributing
 

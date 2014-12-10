@@ -74,13 +74,8 @@ module Glove
       cols            = token_index.size
       @word_vec       = GSL::Matrix.rand(cols, num_components)
       @word_biases    = GSL::Vector.alloc(cols)
-      shuffle_indices = matrix_nnz
 
-      (0..epochs).each do |epoch|
-        shuffled = shuffle_indices.shuffle
-        @word_vec, @word_biases = Workers::TrainingWorker.new(self, shuffled).run
-      end
-
+      train_in_epochs(matrix_nnz)
       self
     end
 
@@ -172,6 +167,16 @@ module Glove
     end
 
     private
+
+    # Perform train iterations
+    #
+    # @param [Array] indices The non-zero value indices in cooc_matrix
+    def train_in_epochs(indices)
+      1.upto(epochs) do |epoch|
+        shuffled = indices.shuffle
+        @word_vec, @word_biases = Workers::TrainingWorker.new(self, shuffled).run
+      end
+    end
 
     # Builds the corpus and sets @token_index and @token_pairs
     def fit_corpus(text)

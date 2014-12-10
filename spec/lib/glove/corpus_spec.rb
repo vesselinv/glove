@@ -62,4 +62,16 @@ describe Glove::Corpus do
       expect(last_pair.neighbors).to  eq %w(fox jump over lazi dog)
     end
   end
+
+  describe '#token_neighbors(word, index)' do
+    let(:corpus) { described_class.new(text, stop_words: false, min_count: 1) }
+    before do
+      corpus.build_count
+    end
+
+    it "returns window number of neighbors on each side" do
+      neighbors = corpus.token_neighbors('jump', 4)
+      expect(neighbors).to eq(['brown', 'fox', 'over', 'the'])
+    end
+  end
 end

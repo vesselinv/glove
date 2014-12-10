@@ -44,7 +44,6 @@ module Glove
       split
       normalize   if @opt[:normalize]
       stem        if @opt[:stem]
-
       text
     end
 
@@ -85,7 +84,7 @@ module Glove
 
     # Reads the default stop words file and return array of its entries
     def stop_words_array
-      @stop_word ||= File.read(File.join(Glove.root_path, 'resources', 'en.stop')).split
+      @stop_words ||= File.read(File.join(Glove.root_path, 'resources', 'en.stop')).split
     end
   end
 end
