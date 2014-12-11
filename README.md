@@ -33,6 +33,8 @@ OS X:
 
     $ brew install gsl
 
+Only compatible with MRI: tested in versions 2.0.x and 2.1.x
+
 ## Installation
 
 Not yet submitted to rubygems.org so clone and run `bundle install`
@@ -42,6 +44,7 @@ Not yet submitted to rubygems.org so clone and run `bundle install`
 ```ruby
 require 'glove'
 
+# See documentation for all available options
 model = Glove::Model.new
 
 # Next feed it some text.
@@ -75,7 +78,6 @@ model.load('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
 
 ## TODO
 
-- Improve test coverage
 - Perform benchmark with texts containing more than 100K words.
 - Word Vector graphs
 
