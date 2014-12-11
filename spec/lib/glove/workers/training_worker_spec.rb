@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Glove::Workers::TrainingWorker do
   let(:text)    { 'quick fox brown fox' }
-  let(:opt)     { {min_count: 1, stop_words: false, threads: 1} }
+  let(:opt)     { {min_count: 1, stop_words: false, threads: 0} }
   let(:model)   { Glove::Model.new(opt).fit(text) }
   let(:index)   { model.send(:matrix_nnz)[0] }
   let(:worker)  { described_class.new(model, [index]) }
@@ -19,11 +19,12 @@ describe Glove::Workers::TrainingWorker do
 
   describe '#run' do
     before do
+      allow(model).to receive(:threads).and_return(1)
       allow(worker).to receive(:work)
     end
 
     it 'runs the #work method :threads number of times' do
-      expect(worker).to receive(:work).exactly(opt[:threads]).times
+      expect(worker).to receive(:work).exactly(1).times
       worker.run
     end
 
