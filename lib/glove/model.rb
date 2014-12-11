@@ -38,7 +38,7 @@ module Glove
     #   matrix
     # @option options [Integer] :epochs (5) Number of training iterations
     # @option options [Integer] :threads (4) Number of threads to use in building
-    #   the co-occurence matrix and training iterations
+    #   the co-occurence matrix and training iterations. Must be greater then 0
     # @return [Glove::Model] A GloVe model.
     def initialize(options={})
       @opts = DEFAULTS.dup.merge(options)
@@ -65,16 +65,13 @@ module Glove
     def fit(text)
       fit_corpus(text)
       build_cooc_matrix
+      build_word_vectors
       self
     end
 
     # Train the model. Must call #fit prior
     # @return [Glove::Model] Current instance
     def train
-      cols            = token_index.size
-      @word_vec       = GSL::Matrix.rand(cols, num_components)
-      @word_biases    = GSL::Vector.alloc(cols)
-
       train_in_epochs(matrix_nnz)
       self
     end
@@ -189,6 +186,13 @@ module Glove
 
       @token_index = corpus.index
       @token_pairs = corpus.pairs
+    end
+
+    # Create initial values for @word_vec and @word_biases
+    def build_word_vectors
+      cols          = token_index.size
+      @word_vec     = GSL::Matrix.rand(cols, num_components)
+      @word_biases  = GSL::Vector.alloc(cols)
     end
 
     # Buids the co-occurence matrix

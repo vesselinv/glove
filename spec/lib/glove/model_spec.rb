@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Glove::Model do
+  let(:text) { 'the quick brown fox jumped over the lazy dog' }
   let(:model) { Glove::Model.new }
 
   describe '.new(options)' do
@@ -17,8 +18,30 @@ describe Glove::Model do
 
   describe '#fit(text)' do
     before do
+      allow(model).to receive(:fit_corpus).with(text)
       allow(model).to receive(:build_cooc_matrix)
-      model.fit('the quick brown fox jumped over the lazy dog')
+      allow(model).to receive(:build_word_vectors)
+    end
+
+    it 'calls its internal methods #fit_corpus to build the corpus obj' do
+      expect(model).to receive(:fit_corpus).with(text)
+      model.fit(text)
+    end
+
+    it 'calls its internal methods #build_cooc_matrix to build the corpus obj' do
+      expect(model).to receive(:build_cooc_matrix)
+      model.fit(text)
+    end
+
+    it 'calls its internal methods #build_word_vectors to build the corpus obj' do
+      expect(model).to receive(:build_word_vectors)
+      model.fit(text)
+    end
+  end
+
+  describe '#fit_corpus(text)' do
+    before do
+      model.send :fit_corpus, text
     end
 
     it "build a corpus object from text string argument" do
@@ -31,20 +54,10 @@ describe Glove::Model do
     end
   end
 
-  describe '#train' do
-    let(:token_index) { {'the' => 0, 'quick' => 1, 'brown' => 2, 'fox' => 3} }
-    let(:cooc_matrix) { GSL::Matrix.rand(4,4) }
-    let(:trainer)     { double(:train) }
+  describe '#build_word_vectors' do
     before do
-      allow(model).to receive(:cooc_matrix).and_return(cooc_matrix)
-      allow(model).to receive(:token_index).and_return(token_index)
-      allow(model).to receive(:train_in_epochs).and_return(trainer)
-
-      model.train
-    end
-
-    after(:each) do
-      model.train
+      allow(model).to receive(:token_index).and_return([0,1,2,3,4])
+      model.send :build_word_vectors
     end
 
     it 'creates @word_vec matrix with random floats' do
@@ -54,9 +67,18 @@ describe Glove::Model do
     it 'creates @word_biases vector with zeros' do
       expect(model.word_biases.isnull?).to eq(true)
     end
+  end
+
+  describe '#train' do
+    let(:cooc_matrix) { GSL::Matrix.rand(4,4) }
+    before do
+      allow(model).to receive(:cooc_matrix).and_return(cooc_matrix)
+      allow(model).to receive(:train_in_epochs)
+    end
 
     it 'calls the #train_in_epochs method' do
       expect(model).to receive(:train_in_epochs)
+      model.train
     end
   end
 

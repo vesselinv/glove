@@ -46,6 +46,7 @@ module Glove
         hash
       end.to_h.keep_if{ |word,count| count >= min_count }
     end
+    alias_method :build_count, :count
 
     # A hash whose values hold the senquantial index of a word as it appears in
     # the #count hash
@@ -58,6 +59,7 @@ module Glove
         hash
       end
     end
+    alias_method :build_index, :index
 
     # Iterates over the tokens array and contructs {Glove::TokenPair}s where
     # neighbors holds the adjacent (context) words. The number of neighbours is
@@ -71,6 +73,7 @@ module Glove
         TokenPair.new(word, token_neighbors(word, index))
       end.compact
     end
+    alias_method :build_pairs, :pairs
 
     # Construct array of neighbours to the given word and its index in the tokens
     # array
@@ -86,10 +89,6 @@ module Glove
         neighbor unless word == neighbor
       end.compact
     end
-
-    alias_method :build_index, :index
-    alias_method :build_count, :count
-    alias_method :build_pairs, :pairs
 
     # Data to dump with Marshal.dump
     def marshal_dump

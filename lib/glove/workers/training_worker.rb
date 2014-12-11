@@ -7,21 +7,21 @@ module Glove
       # @!attribute [r] indices
       #   @return [Glove::Corpus] Shuffled co-occurrence matrix slots
       # @!attribute [r] word_vec
-      #   @return [GSL::Matrix] Clone of @parent.word_vec
+      #   @return [GSL::Matrix] Clone of @caller.word_vec
       # @!attribute [r] word_biases
-      #   @return [GSL::Vector] Clone of @parent.word_biases
+      #   @return [GSL::Vector] Clone of @caller.word_biases
       attr_accessor :indices, :word_vec, :word_biases
 
-      def_delegators :@parent, :cooc_matrix, :threads, :max_count, :alpha, :learning_rate
+      def_delegators :@caller, :cooc_matrix, :threads, :max_count, :alpha, :learning_rate
 
       # Create a {Glove::Workers::TrainingWorker} instance
-      # @param [Glove::Model] parent Caller class
-      # @param [Array<(Integer, Integer)>] indices Shuffled indices of non-zero elements
-      #   in the model's co-occurence matrix
-      def initialize(parent, indices)
-        @parent, @indices = parent, indices
-        @word_vec     = @parent.word_vec.dup
-        @word_biases  = @parent.word_biases.dup
+      # @param [Glove::Model] caller Caller class
+      # @param [Array<(Integer, Integer)>] indices Shuffled indices of non-zero
+      #   elements in the model's co-occurence matrix
+      def initialize(caller, indices)
+        @caller, @indices = caller, indices
+        @word_vec     = @caller.word_vec.dup
+        @word_biases  = @caller.word_biases.dup
       end
 
       # Runs the calculations

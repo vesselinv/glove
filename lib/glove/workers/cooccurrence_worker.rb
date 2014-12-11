@@ -5,23 +5,25 @@ module Glove
       extend ::Forwardable
 
       # @!attribute [r] token_index
-      #   @return [Hash{String=>Integer}] Clone of @parent.token_index
+      #   @return [Hash{String=>Integer}] Clone of @caller.token_index
       # @!attribute [r] word_biases
-      #   @return [Array<(Glove::TokenPair)>] Clone of @parent.token_pairs
+      #   @return [Array<(Glove::TokenPair)>] Clone of @caller.token_pairs
       attr_reader :token_index, :token_pairs
 
-      def_delegators :@parent, :threads
+      def_delegators :@caller, :threads
 
       # Creates instance of the class
       #
-      # @param [Glove::Model] parent Caller class
-      def initialize(klass)
-        @parent = klass
-        @token_index = @parent.token_index.dup
-        @token_pairs = @parent.token_pairs.dup
+      # @param [Glove::Model] caller Caller class
+      def initialize(caller)
+        @caller = caller
+        @token_index = @caller.token_index.dup
+        @token_pairs = @caller.token_pairs.dup
       end
 
       # Perform the building of the matrix
+      #
+      # @return [GSL::Matrix] The co-occurrence matrix
       def run
         vectors = Parallel.map(token_index, in_processes: threads) do |slice|
           build_cooc_matrix_col(slice)
@@ -35,7 +37,7 @@ module Glove
       # entire vocabulary
       #
       # @param [Array<(String, Integer)>] slice Token with index
-      # @return [Array] GSL::Vector#to_a
+      # @return [Array] GSL::Vector#to_a representation of the column
       def build_cooc_matrix_col(slice)
         token = slice[0]
         vector = GSL::Vector.alloc(token_index.size)
