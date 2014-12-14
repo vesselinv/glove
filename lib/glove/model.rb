@@ -131,7 +131,7 @@ module Glove
     #   model.analogy_words('quantum', 'physics', 'atom')
     #   # => [["electron", 0.98583], ["energi", 0.98151], ["photon",0.96650]]
     # @return [Array] List of related words to target
-    def analogy_words(word1, word2, target, num = 3, accuracy = 0.0001)
+    def analogy_words(word1, word2, target, num=3, accuracy=0.0001)
       word1  = word1.stem
       word2  = word1.stem
       target = target.stem
@@ -153,9 +153,7 @@ module Glove
     #   model.most_similar('physics', 1) # => ["quantum", 0.9967993356234444]
     # @return [Array] List of most similar words with cosine distance as values
     def most_similar(word, num=3)
-      word = word.stem
-
-      vector_distance(word).take(num)
+      vector_distance(word.stem).take(num)
     end
 
     # Prevent token_pairs, matrices and vectors to fill up the terminal
