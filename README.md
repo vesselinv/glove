@@ -76,9 +76,33 @@ model.load('corpus.bin', 'cooc-matrix.bin', 'word-vec.bin', 'word-biases.bin')
 # Now you can query the model again and get the same results as above
 ```
 
+# Performance
+
+Thanks to the [rb-gsl](https://github.com/blackwinter/rb-gsl) bindings for
+[GSL](https://www.gnu.org/software/gsl/), matrix/vector operations are fast. The
+glove algorythm itself, however, requires quite a bit of computational power, even
+the original C library. If you need speed, use smaller texts with vocabulaty size
+no more than 100K words. Processing text with 160K words (compilation of several
+books on quantum mechanics) on a late 2012 MBP (8GB RAM) with ruby-2.1.5 takes
+about 7 minutes:
+
+     $ ruby -Ilib benchmark/benchmark.rb
+                     user     system      total        real
+    Fit Text    11.320000   0.070000  11.390000 ( 11.387612)
+    Vocabulary size: 158323
+    Unique tokens: 2903
+    Co-occur     1.330000   0.250000 1107.720000 (300.738453)
+    Train      121.120000  12.960000  134.080000 (128.409034)
+    Similarity   0.010000   0.000000    0.010000 (  0.057423)
+    Give me the 3 most similar words to quantum
+    [["problem", 0.9977609386134489], ["mechan", 0.9977529272587808], ["classic", 0.9974759411408415]]
+    Analogy      0.010000   0.000000   0.010000 (  0.010674)
+    What 3 words relate to atom like quantum relates to mechanics?
+    [["particl", 0.9982711579369483], ["find", 0.9982303885530384], ["expect", 0.9982017117355527]]
+
+
 ## TODO
 
-- Perform benchmark with texts containing more than 100K words.
 - Word Vector graphs
 
 ## Contributing

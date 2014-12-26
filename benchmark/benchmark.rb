@@ -33,7 +33,7 @@ Benchmark.bm(10) do |bm|
   end
 
   bm.report("Analogy") do
-    puts "What 3 words relate to atom like quantum relates to physics?\n"
-    puts model.analogy_words('quantum', 'physics', 'atom').inspect
+    puts "What 3 words relate to atom like quantum relates to mechanics?\n"
+    puts model.analogy_words('quantum', 'mechanics', 'atom').inspect
   end
 end

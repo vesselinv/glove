@@ -139,8 +139,7 @@ module Glove
       distance = cosine(vector(word1), vector(word2))
 
       vector_distance(target).reject do |item|
-        dist = item[1]
-        diff = dist.to_f.abs - distance
+        diff = item[1].to_f.abs - distance
         diff.abs < accuracy
       end.take(num)
     end
@@ -217,9 +216,7 @@ module Glove
     # @param [String] word The word to transform into a vector
     # @return [GSL::Vector] The corresponding vector into the #word_vec matrix
     def vector(word)
-      word_index = token_index[word]
-
-      return nil unless word_index
+      return nil unless word_index = token_index[word]
       word_vec.row(word_index)
     end
 
@@ -229,9 +226,7 @@ module Glove
     # @param [String] word The word to compare against
     # @return [Array<(String, Integer)>] Array of tokens and their distance
     def vector_distance(word)
-      word_vector = vector(word)
-
-      return {} unless word_vec
+      return {} unless word_vector = vector(word)
 
       token_index.map.with_index do |(token,count), idx|
         next if token.eql? word

@@ -2,7 +2,6 @@ require 'glove/version'
 require 'gsl'
 require 'fast_stemmer'
 require 'parallel'
-require 'core_ext/float'
 
 module Glove
   # Return the root path of the gem
