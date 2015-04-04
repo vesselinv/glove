@@ -37,7 +37,15 @@ Only compatible with MRI: tested in versions 2.0.x and 2.1.x
 
 ## Installation
 
-Not yet submitted to rubygems.org so clone and run `bundle install`
+```
+$ gem install glove
+```
+
+or add to your Gemfile
+
+```ruby
+gem 'glove'
+```
 
 ## Usage
 
